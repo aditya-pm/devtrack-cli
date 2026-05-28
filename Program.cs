@@ -19,12 +19,7 @@ class Program
             switch(choice)
             {
                 case "GitHub Repository Summary":
-                    AnsiConsole.MarkupLine("[green]Recent Repositories:[/]");
-                    List<string> recentRepos = await  historyService.GetRecentRepositoriesAsync();
-                    foreach (string recentRepo in recentRepos)
-                    {
-                        AnsiConsole.MarkupLine($"[grey]{recentRepo}[/]");
-                    }
+                    await HistoryView.ShowRecentRepos();
                     AnsiConsole.WriteLine();
 
                     string repoName = AnsiConsole.Ask<string>("\nEnter repository name:");
