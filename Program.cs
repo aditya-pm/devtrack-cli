@@ -19,7 +19,8 @@ class Program
             switch(choice)
             {
                 case "GitHub Repository Summary":
-                    await HistoryView.ShowRecentRepos();
+                    List<string> recentRepos = await historyService.GetRecentRepositoriesAsync();
+                    await HistoryView.ShowRecentRepos(recentRepos);
                     AnsiConsole.WriteLine();
 
                     string repoName = AnsiConsole.Ask<string>("\nEnter repository name:");

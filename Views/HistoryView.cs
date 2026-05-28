@@ -1,15 +1,11 @@
 using Spectre.Console;
-using DevTrackCLI.Services;
 
 namespace DevTrackCLI.Views;
 
 static class HistoryView
 {
-    public static async Task ShowRecentRepos()
+    public static async Task ShowRecentRepos(List<string> recentRepos)
     {
-        HistoryService historyService = new();
-        List<string> recentRepos = await historyService.GetRecentRepositoriesAsync();
-
         var table = new Table();
         table.Border(TableBorder.Rounded);
         table.AddColumn("[yellow]Recent Searches[/]");
