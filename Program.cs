@@ -54,6 +54,12 @@ class Program
                         CommitView.ShowCommits(commits);
                     }
 
+                    Dictionary<string, double>? languages = await githubService.GetLanguagesAsync(repoName);
+                    if (languages != null)
+                    {
+                        LanguageView.ShowLanguages(languages);
+                    }
+
                     AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
                     Console.ReadKey();
                     break;
