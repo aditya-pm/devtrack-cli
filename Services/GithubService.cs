@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.Json;
 using DevTrackCLI.Interfaces;
 using DevTrackCLI.Models;
@@ -32,6 +33,31 @@ class GithubService : IGithubService
 
             GithubRepo? repo = JsonSerializer.Deserialize<GithubRepo>(json);
             return repo;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<List<GitHubCommit>?> GetRecentCommitsAsync(string repoName)
+    {
+        try
+        {
+            string url = $"https://api.github.com/repos/{repoName}/commits";
+
+            HttpResponseMessage respose = await httpClient.GetAsync(url);
+
+            if (!respose.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            string json = await respose.Content.ReadAsStringAsync();
+
+            List<GitHubCommit>? commits = JsonSerializer.Deserialize<List<GitHubCommit>>(json);
+
+            return commits;
         }
         catch
         {
