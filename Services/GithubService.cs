@@ -48,16 +48,43 @@ class GithubService : IGithubService
 
             HttpResponseMessage respose = await httpClient.GetAsync(url);
 
-            if (!respose.IsSuccessStatusCode)
-            {
-                return null;
-            }
+            if (!respose.IsSuccessStatusCode) return null;
 
             string json = await respose.Content.ReadAsStringAsync();
 
             List<GitHubCommit>? commits = JsonSerializer.Deserialize<List<GitHubCommit>>(json);
 
             return commits;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public async Task<Dictionary<string, double>?> GetLanguagesAsync(string repoName)
+    {
+        try
+        {
+            string url = $"https://api.github.com/repos/{repoName}/languages";
+
+            HttpResponseMessage response = await httpClient.GetAsync(url);
+            if (!response.IsSuccessStatusCode) return null;
+
+            string json = await response.Content.ReadAsStringAsync();
+            Dictionary<string, int>? languages = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
+            if (languages == null) return null;
+
+            Dictionary<string, double> languagePercentages = [];
+            int totalBytes = languages.Values.Sum();
+            foreach (KeyValuePair<string, int> language in languages)
+            {
+                double percentage = (double)language.Value / totalBytes * 100;
+                languagePercentages.Add(language.Key, percentage);
+            }
+
+            return languagePercentages;
+
         }
         catch
         {

@@ -6,4 +6,5 @@ interface IGithubService
 {
     Task<GithubRepo?> GetRepositoryAsync(string repoName);
     Task<List<GitHubCommit>?> GetRecentCommitsAsync(string repoName);
+    Task<Dictionary<string, double>?> GetLanguagesAsync(string repoName);
 }
