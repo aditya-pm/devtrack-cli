@@ -12,9 +12,9 @@ static class CommitView
         table.Border(TableBorder.Rounded);
         table.AddColumn("[yellow]Recent Commits:[/]");
 
-        foreach (var commit in commits.Take(5))
+        foreach (var commit in commits.Take(3))
         {
-            table.AddRow(commit.Commit.Message);
+            table.AddRow(Markup.Escape(commit.Commit.Message));
         }
 
         AnsiConsole.Write(table);
