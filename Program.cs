@@ -48,16 +48,16 @@ class Program
                         await historyService.SaveRepositoryAsync(repoName);
                     }
 
-                    var commits = await githubService.GetRecentCommitsAsync(repoName);
-                    if (commits != null)
-                    {
-                        CommitView.ShowCommits(commits);
-                    }
-
                     Dictionary<string, double>? languages = await githubService.GetLanguagesAsync(repoName);
                     if (languages != null)
                     {
                         LanguageView.ShowLanguages(languages);
+                    }
+
+                    var commits = await githubService.GetRecentCommitsAsync(repoName);
+                    if (commits != null)
+                    {
+                        CommitView.ShowCommits(commits);
                     }
 
                     AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
