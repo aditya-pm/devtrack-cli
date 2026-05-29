@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace DevTrackCLI.Models;
 
-class GitHubCommits
+class GitHubCommit
 {
     [JsonPropertyName("commit")]
     public CommitInfo Commit { get; set; } = new();
