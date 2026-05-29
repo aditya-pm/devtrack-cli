@@ -48,6 +48,12 @@ class Program
                         await historyService.SaveRepositoryAsync(repoName);
                     }
 
+                    var commits = await githubService.GetRecentCommitsAsync(repoName);
+                    if (commits != null)
+                    {
+                        CommitView.ShowCommits(commits);
+                    }
+
                     AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
                     Console.ReadKey();
                     break;
