@@ -17,6 +17,7 @@ static class MainMenuView
                 .Title("\n[yellow]Select an option:[/]")
                 .AddChoices(
                     "GitHub Repository Summary",
+                    "Task Management",
                     "Exit"
                 )
         );
