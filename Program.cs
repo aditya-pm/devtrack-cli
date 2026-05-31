@@ -41,13 +41,15 @@ class Program
 
                     Dictionary<string, double>? languages = await githubService.GetLanguagesAsync(repoName);
                     List<GitHubCommit>? commits = await githubService.GetRecentCommitsAsync(repoName);
+                    List<GithubContributor>? contributors = await githubService.GetContributorsAsync(repoName);
 
-                    AnsiConsole.Clear();
+                    // AnsiConsole.Clear();
 
-                    if (repo != null && languages != null && commits != null)
+                    if (repo != null && languages != null && commits != null && contributors != null)
                     {
-                        GithubView.Show(repo, languages, commits);
-                    } else
+                        GithubView.Show(repo, languages, commits, contributors);
+                    }
+                    else
                     {
                         AnsiConsole.MarkupLine("[red]Repository not found.[/]");
                     }

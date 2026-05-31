@@ -1,12 +1,12 @@
 using Spectre.Console;
 using DevTrackCLI.Models;
-using System.Runtime.CompilerServices;
+using Spectre.Console.Rendering;
 
 namespace DevTrackCLI.Views;
 
 static class GithubView
 {
-    public static Table ShowRepo(GithubRepo repo)
+    private static Table GetRepoTable(GithubRepo repo)
     {
         var table = new Table();
 
@@ -25,20 +25,9 @@ static class GithubView
         return table;
     }
 
-    public static BarChart ShowLanguages(Dictionary<string, double> languagePercentages)
+    private static BarChart GetLanguagesChart(Dictionary<string, double> languagePercentages)
     {
         var topLanguages = languagePercentages.OrderByDescending(x => x.Value).Take(5);
-        // var table = new Table();
-
-        // table.Border(TableBorder.DoubleEdge);
-        // table.AddColumn("Language");
-        // table.AddColumn("Percentage");
-        // foreach (KeyValuePair<string, double> language in topLanguages)
-        // {
-        //     table.AddRow(language.Key, language.Value.ToString("F2"));
-        // }
-
-        // AnsiConsole.Write(table);
 
         var chart = new BarChart();
         foreach (KeyValuePair<string, double> language in topLanguages)
@@ -49,20 +38,25 @@ static class GithubView
         return chart;
     }
 
-    public static Table ShowCommits(List<GitHubCommit> commits)
+    private static Panel GetCommitsPanel(List<GitHubCommit> commits)
     {
-        var table = new Table();
-
-        table.Border(TableBorder.Rounded);
-        table.AddColumn("[yellow]Recent Commits:[/]");
+        var commitsList = new List<IRenderable>();
+        commitsList.Add(new Rule() { Style = Style.Parse("grey") });
 
         foreach (var commit in commits.Take(5))
         {
             string title = commit.Commit.Message.Split("\n")[0];
-            table.AddRow(Markup.Escape("• " + title));
+            if (title.Length > 50)
+            {
+                title = title[..47] + "...";
+            }
+            commitsList.Add(new Text(Markup.Escape("• " + title)));
+            commitsList.Add(new Rule() { Style = Style.Parse("grey") });
         }
 
-        return table;
+        var rows = new Rows(commitsList);
+
+        return new Panel(rows);
     }
 
     public static void ShowRecentRepos(List<string> recentRepos)
@@ -79,28 +73,49 @@ static class GithubView
         AnsiConsole.Write(table);
     }
 
+    private static BarChart GetContributorsChart(List<GithubContributor> contributors)
+    {
+        double totalContributions = contributors
+                                        .Take(5)
+                                        .Sum(contributor => contributor.Contributions);
+        List<double> contributorsPercentages = contributors
+                                                .Take(5)
+                                                .Select(contributor => contributor.Contributions / totalContributions * 100).ToList();
+    
+        var chart = new BarChart();
+        for (int i = 0; i < contributorsPercentages.Count; i++)
+        {
+            chart.AddItem(contributors[i].Login, Math.Round(contributorsPercentages[i], 2));
+        }
+        return chart;
+    }
+
     public static void Show(GithubRepo repo,
                             Dictionary<string, double> languagePercentages,
-                            List<GitHubCommit> commits)
+                            List<GitHubCommit> commits,
+                            List<GithubContributor> contributors)
     {
-        Table repoTable = ShowRepo(repo);
-        BarChart languagesChart = ShowLanguages(languagePercentages);
+        Table repoTable = GetRepoTable(repo);
+        BarChart languagesChart = GetLanguagesChart(languagePercentages);
+        Panel recentCommits = GetCommitsPanel(commits);
+        BarChart contributorsTable = GetContributorsChart(contributors);
 
-        Panel repoTablePanel = new Panel(repoTable).Header("[red] Stats [/]", Justify.Center).NoBorder();
-        Panel languagesChartPanel = new Panel(new Panel(languagesChart)).Header("Languages").NoBorder();
+        Panel repoTablePanel = new Panel(repoTable)
+                                    .Header("[red]Stats[/]", Justify.Center).NoBorder();
+        Panel languagesChartPanel = new Panel(new Panel(languagesChart))
+                                    .Header("[red]Top 5 Languages[/]", Justify.Center).NoBorder();
+        Panel recentCommitsPanel = new Panel(recentCommits)
+                                    .Header("[red]Recent Commits[/]", Justify.Center).NoBorder();
+        Panel contributorsTablelPanel = new Panel(new Panel(contributorsTable))
+                                    .Header("[red]Top 5 Contributors[/]", Justify.Center).NoBorder();
 
-        Grid repoAndLanguagesGrid = new Grid();
-        repoAndLanguagesGrid.AddColumns(2);
-        repoAndLanguagesGrid.AddRow(repoTablePanel, languagesChartPanel);
-        repoAndLanguagesGrid.AddEmptyRow();
+        var githubViewGrid = new Grid();
+        githubViewGrid.AddColumns(2);
+        githubViewGrid.AddRow(repoTablePanel, languagesChartPanel);
+        githubViewGrid.AddEmptyRow();
+        githubViewGrid.AddRow(recentCommitsPanel, contributorsTablelPanel);
+        githubViewGrid.AddEmptyRow();
 
-        AnsiConsole.Write(repoAndLanguagesGrid);
-
-        AnsiConsole.Write(new Rule());
-        AnsiConsole.WriteLine();
-
-        Table recentCommits = ShowCommits(commits);
-        AnsiConsole.Write(recentCommits);
-
+        AnsiConsole.Write(githubViewGrid);
     }
 }
