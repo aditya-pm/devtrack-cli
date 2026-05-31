@@ -20,8 +20,10 @@ class Program
             switch (choice)
             {
                 case "GitHub Repository Summary":
+                    AnsiConsole.Clear();
+
                     List<string> recentRepos = await historyService.GetRecentRepositoriesAsync();
-                    await HistoryView.ShowRecentRepos(recentRepos);
+                    GithubView.ShowRecentRepos(recentRepos);
                     AnsiConsole.WriteLine();
 
                     string repoName = AnsiConsole.Ask<string>("\nEnter repository name:");
@@ -37,28 +39,17 @@ class Program
                             }
                         );
 
+                    Dictionary<string, double>? languages = await githubService.GetLanguagesAsync(repoName);
+                    List<GitHubCommit>? commits = await githubService.GetRecentCommitsAsync(repoName);
+
                     AnsiConsole.Clear();
 
-                    if (repo == null)
+                    if (repo != null && languages != null && commits != null)
+                    {
+                        GithubView.Show(repo, languages, commits);
+                    } else
                     {
                         AnsiConsole.MarkupLine("[red]Repository not found.[/]");
-                    }
-                    else
-                    {
-                        GithubView.ShowRepo(repo);
-                        await historyService.SaveRepositoryAsync(repoName);
-                    }
-
-                    Dictionary<string, double>? languages = await githubService.GetLanguagesAsync(repoName);
-                    if (languages != null)
-                    {
-                        LanguageView.ShowLanguages(languages);
-                    }
-
-                    var commits = await githubService.GetRecentCommitsAsync(repoName);
-                    if (commits != null)
-                    {
-                        CommitView.ShowCommits(commits);
                     }
 
                     AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
