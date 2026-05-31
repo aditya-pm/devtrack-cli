@@ -8,23 +8,36 @@ static class TaskView
     {
         AnsiConsole.Clear();
 
-        var table = new Table();
-        table.Border(TableBorder.Rounded);
-
-        table.AddColumn("Title");
-        table.AddColumn("Status");
-        table.AddColumn("Created At");
-
-        foreach (TaskItem task in tasks)
+        if (tasks.Count == 0)
         {
-            table.AddRow(
-                task.Title,
-                task.IsCompleted ? "Completed" : "Pending",
-                task.CreatedAt.ToString()
-            );
+            Panel noTasks = new Panel("No tasks added!");
+            AnsiConsole.Write(noTasks);
         }
+        else
+        {
+            var table = new Table();
+            table.Border(TableBorder.Rounded);
 
-        AnsiConsole.Write(table);
+            table.AddColumn("Title");
+            table.AddColumn("Status");
+            table.AddColumn("Created At");
+
+            foreach (TaskItem task in tasks)
+            {
+                table.AddRow(
+                    task.Title,
+                    task.IsCompleted ? "Completed" : "Pending",
+                    task.CreatedAt.ToString()
+                );
+            }
+
+            var taskPanel = new Panel(table).Header("Tasks Overview", Justify.Center)
+                .Padding(1, 1)
+                .BorderColor(Color.Aqua)
+                .RoundedBorder();
+
+            AnsiConsole.Write(taskPanel);
+        }
     }
 
     public static string DisplayChoices()

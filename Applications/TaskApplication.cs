@@ -35,12 +35,16 @@ class TaskApplication
             switch (taskChoice)
             {
                 case "Add Task":
+                    AnsiConsole.Clear();
                     var taskName = AnsiConsole.Ask<string>("Enter task name: ");
                     await taskService.AddTaskAsync(taskName);
                     AnsiConsole.MarkupLine($"[green]Task {taskName} successfully added![/]");
+                    AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
+                    Console.ReadKey();
                     break;
 
                 case "Mark Task Completed":
+                    AnsiConsole.Clear();
                     if (taskNames.Count() == 0)
                     {
                         AnsiConsole.MarkupLine($"[red]No tasks added![/]");
@@ -55,6 +59,7 @@ class TaskApplication
                     break;
 
                 case "Delete Task":
+                    AnsiConsole.Clear();
                     if (taskNames.Count() == 0)
                     {
                         AnsiConsole.MarkupLine($"[red]No tasks added![/]");
@@ -68,9 +73,6 @@ class TaskApplication
                     await taskService.DeleteTasksAsync(selectedTasksToDelete);
                     break;
             }
-
-            AnsiConsole.MarkupLine("\n[grey]Press any key to continue...[/]");
-            Console.ReadKey();
         }
     }
 }
