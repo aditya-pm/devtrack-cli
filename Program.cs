@@ -43,11 +43,12 @@ class Program
                     List<GitHubCommit>? commits = await githubService.GetRecentCommitsAsync(repoName);
                     List<GithubContributor>? contributors = await githubService.GetContributorsAsync(repoName);
 
-                    // AnsiConsole.Clear();
+                    AnsiConsole.Clear();
 
                     if (repo != null && languages != null && commits != null && contributors != null)
                     {
                         GithubView.Show(repo, languages, commits, contributors);
+                        await historyService.SaveRepositoryAsync(repoName);
                     }
                     else
                     {
